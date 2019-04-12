@@ -2,6 +2,7 @@ package com.randomdevelopment.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 public class GatewayApplication {
@@ -10,5 +11,9 @@ public class GatewayApplication {
 		SpringApplication.run(GatewayApplication.class, args);
 	}
 
+	@Bean
+	public MonitorProvider monitorProvider(){
+		return new MonitorProvider();
+	}
 
 }
