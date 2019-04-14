@@ -9,7 +9,7 @@ import org.springframework.web.client.RestTemplate;
 import com.randomdevelopment.gateway.model.Metric;
 import com.randomdevelopment.gateway.model.Monitor;
 import com.randomdevelopment.gateway.model.Monitors;
-import com.randomdevelopment.gateway.model.Resource;
+import com.randomdevelopment.gateway.model.MResource;
 import com.randomdevelopment.gateway.model.Resources;
 
 public class MonitorProvider {
@@ -18,10 +18,10 @@ public class MonitorProvider {
 	public MonitorProvider()
 	{
 		monitorUris = new HashMap<>();
-		monitorUris.put("mock-hdmi", "http://hibron.usermd.net:5000/mock/monitors/monitor_hdmi");
-		monitorUris.put("mock-komplex", "http://hibron.usermd.net:5000/mock/monitors/monitor_komplex");
-		monitorUris.put("mock-dsub", "http://hibron.usermd.net:5000/mock/monitors/monitor_dsub");
-		monitorUris.put("mock-bez-kompa", "http://hibron.usermd.net:5000/mock/monitors/monitor_bez_kompa");
+		monitorUris.put("monitor_hdmi", "http://hibron.usermd.net:5000/mock/monitors/monitor_hdmi/");
+		monitorUris.put("monitor_komplex", "http://hibron.usermd.net:5000/mock/monitors/monitor_komplex/");
+		monitorUris.put("monitor_dsub", "http://hibron.usermd.net:5000/mock/monitors/monitor_dsub/");
+		monitorUris.put("monitor_bez_kompa", "http://hibron.usermd.net:5000/mock/monitors/monitor_bez_kompa/");
 	}
 
 	public HashMap<String, String> getMonitorUris() {
@@ -30,6 +30,10 @@ public class MonitorProvider {
 
 	public void setMonitorUris(HashMap<String, String> monitorUris) {
 		this.monitorUris = monitorUris;
+	}
+	
+	public String getMonitorUri(String monitorName) {
+		return monitorUris.get(monitorName);
 	}
 	
 	public Monitors getMonitorsData(String dataUri) {
@@ -42,8 +46,9 @@ public class MonitorProvider {
 
 		    final String uri = monitorUri;
 			RestTemplate restTemplate = new RestTemplate();
-			Resource[] resources = restTemplate.getForObject(uri, Resource[].class);
 			System.out.println(uri);
+			MResource[] resources = restTemplate.getForObject(uri, MResource[].class);
+			
 			Monitor monitor = new Monitor();
 			monitor.setName(key);
 			monitor.setResources(resources);

@@ -1,6 +1,6 @@
 package com.randomdevelopment.gateway.model;
 
-public class Resource {
+public class MResource {
 	private String name;
 	private Metric[] metrics;
 	public String getName() {

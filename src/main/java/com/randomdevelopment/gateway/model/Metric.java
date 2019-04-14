@@ -1,5 +1,9 @@
 package com.randomdevelopment.gateway.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.randomdevelopment.gateway.MetricDeserializer;
+
+@JsonDeserialize(using = MetricDeserializer.class)
 public class Metric {
 	private String name;
 	private String type;

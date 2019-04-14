@@ -1,13 +1,13 @@
 package com.randomdevelopment.gateway.model;
 
 public class Resources {
-	private Resource[] resources;
+	private MResource[] resources;
 
-	public Resource[] getResources() {
+	public MResource[] getResources() {
 		return resources;
 	}
 
-	public void setResources(Resource[] resources) {
+	public void setResources(MResource[] resources) {
 		this.resources = resources;
 	}
 }

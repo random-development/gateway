@@ -2,17 +2,17 @@ package com.randomdevelopment.gateway.model;
 
 public class Monitor {
 	private String name;
-	private Resource[] resources;
+	private MResource[] resources;
 	public String getName() {
 		return name;
 	}
 	public void setName(String name) {
 		this.name = name;
 	}
-	public Resource[] getResources() {
+	public MResource[] getResources() {
 		return resources;
 	}
-	public void setResources(Resource[] resources) {
+	public void setResources(MResource[] resources) {
 		this.resources = resources;
 	}
 }
