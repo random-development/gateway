@@ -343,4 +343,35 @@ public class MockController {
 	public String monitors11() {
 		return "dziekujemy za dodanie/usuniecie metryki kompleksowej ";
 	}
+	
+	@GetMapping
+	@RequestMapping(produces = "application/json", value = "/metrics")
+	public String metrics() {
+		return "[\r\n" + 
+				"    {\r\n" + 
+				"        \"name\": \"hostName\",\r\n" + 
+				"        \"type\": \"cpu\",\r\n" + 
+				"        \"lastValue\": 50,\r\n" + 
+				"        \"time\": 1554663619,\r\n" + 
+				"        \"timeData\": [1554663615, 1554663616, 1554663617, 1554663618, 1554663619],\r\n" + 
+				"        \"valueData\": [213, 214, 215, 264, 214]\r\n" + 
+				"    },\r\n" + 
+				"    {\r\n" + 
+				"        \"name\": \"hostName2\",\r\n" + 
+				"        \"type\": \"temp\",\r\n" + 
+				"        \"lastValue\": 99,\r\n" + 
+				"        \"time\": 1554643619,\r\n" + 
+				"        \"timeData\": [1554643615, 1554643616, 1554643617, 1554643618, 1554643619],\r\n" + 
+				"        \"valueData\": [78, 88, 97, 98, 99]\r\n" + 
+				"    },\r\n" + 
+				"    {\r\n" + 
+				"        \"name\": \"trzeci\",\r\n" + 
+				"        \"type\": \"temp\",\r\n" + 
+				"        \"lastValue\": 125,\r\n" + 
+				"        \"time\": 1554643630,\r\n" + 
+				"        \"timeData\": [1554643615, 1554643616, 1554643617, 1554643618, 1554643619, 1554643620, 1554643625, 1554643630],\r\n" + 
+				"        \"valueData\": [78, 88, 97, 98, 99, 100, 120, 125]\r\n" + 
+				"    }\r\n" + 
+				"]";
+	}
 }
