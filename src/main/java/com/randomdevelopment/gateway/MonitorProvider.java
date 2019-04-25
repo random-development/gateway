@@ -105,6 +105,13 @@ public class MonitorProvider {
 				break;
 			}
 		}
+		monitorRepository.deleteAll();
+		monitorRepository.save(new MonitorDB((long)1, monitorUris));
+	}
+	
+	public void removeAll() {
+		monitorUris = new HashMap<>();
+		monitors = new ArrayList<>();
 	}
 	
 	public Monitors getMonitorsData(String dataUri) {

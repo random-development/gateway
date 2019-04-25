@@ -54,4 +54,13 @@ public class MonitorController {
 		return "OK";
 	}
 	
+	@GetMapping
+	@RequestMapping(produces = "application/json", value = "/reset", method = RequestMethod.GET)
+	public String reset() {
+
+		monitorProvider.removeAll();
+		
+		return "{\"status\" : \"ok\"}";
+	}
+	
 }
