@@ -337,6 +337,33 @@ public class MockController {
 				"}";
 	}
 	
+	@GetMapping
+	@RequestMapping(produces = "application/json", value = "/monitors/{mname}/resources/{rname}/metrics/{mnamee}/measurementss")
+	public String monitors100() {
+		return "[\r\n" + 
+				"    {\r\n" + 
+				"        \"time\": 1234567890,\r\n" + 
+				"        \"value\": 11.1\r\n" + 
+				"    },\r\n" + 
+				"    {\r\n" + 
+				"        \"time\": 1234567891,\r\n" + 
+				"        \"value\": 12.1\r\n" + 
+				"    },\r\n" + 
+				"    {\r\n" + 
+				"        \"time\": 1234567892,\r\n" + 
+				"        \"value\": 15.1\r\n" + 
+				"    },\r\n" + 
+				"    {\r\n" + 
+				"        \"time\": 1234567893,\r\n" + 
+				"        \"value\": 17.1\r\n" + 
+				"    },\r\n" + 
+				"    {\r\n" + 
+				"        \"time\": 1234567894,\r\n" + 
+				"        \"value\": 91.1\r\n" + 
+				"    }\r\n" + 
+				"]";
+	}
+	
 	@DeleteMapping
 	@PostMapping
 	@RequestMapping(value = "/monitors/{mname}/resources/{kname}/metrics")

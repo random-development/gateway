@@ -13,6 +13,9 @@ public class Monitor {
 		return resources;
 	}
 	public void setResources(MResource[] resources) {
+		for(MResource resource: resources) {
+			resource.setMonitorName(name);
+		}
 		this.resources = resources;
 	}
 }
