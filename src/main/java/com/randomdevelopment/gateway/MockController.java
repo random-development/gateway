@@ -322,7 +322,7 @@ public class MockController {
 				"                        }";
 	}
 	
-	@GetMapping
+	/*@GetMapping
 	@RequestMapping(produces = "application/json", value = "/monitors/{mname}/resources/{rname}/metrics/{mnamee}/measurements")
 	public String monitors10() {
 		return "{\r\n" + 
@@ -335,10 +335,10 @@ public class MockController {
 				"        [\"5\", \"1554663619\", \"214\"]\r\n" + 
 				"    ]\r\n" + 
 				"}";
-	}
+	}*/
 	
 	@GetMapping
-	@RequestMapping(produces = "application/json", value = "/monitors/{mname}/resources/{rname}/metrics/{mnamee}/measurementss")
+	@RequestMapping(produces = "application/json", value = "/monitors/{mname}/resources/{rname}/metrics/{mnamee}/measurements")
 	public String monitors100() {
 		return "[\r\n" + 
 				"    {\r\n" + 

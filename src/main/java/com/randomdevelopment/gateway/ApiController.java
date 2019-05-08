@@ -46,7 +46,8 @@ public class ApiController {
 			@RequestParam(value = "resourceName", required = false) String resourceName,
 			@RequestParam(value = "type", required = false) String type,
 			@RequestParam(value = "from", required = false) String from,
-			@RequestParam(value = "to", required = false) String to) {
+			@RequestParam(value = "to", required = false) String to,
+			@RequestParam(value = "limit", required = false) String limit) {
 		System.out.println(resourcesData);
 		
 		List<MResource> resourcesFiltered = new ArrayList<>(); 
@@ -104,13 +105,29 @@ public class ApiController {
 		for(MResource resource: resourcesFiltered) {
 			for(Metric metric: resource.getMetrics()) {
 				//type filter
-				if(type == null || metric.getName().contains(type)) {
+				boolean inFilter = false;
+				if(type != null) {
+					String[] types = type.split(",");
+					for(String singleType: types) {
+						if (metric.getName().contains(singleType)) {
+							inFilter = true;
+							break;
+						}
+					}
+				} else {
+					inFilter = true;
+				}
+				if(inFilter) {
 					/*MetricsData data = new MetricsData();
 					data.setName(resource.getMonitorName());
 					data.setType(metric.getType());*/
 
-					metricsDatas.add(getMetricsData(resource.getMonitorName(),
-							resource.getName(), metric.getName(), from, to, null/*limit*/));
+					MetricsData data = getMetricsData(resource.getMonitorName(),
+							resource.getName(), metric.getName(), from, to, limit);
+					if(data != null) {
+						metricsDatas.add(getMetricsData(resource.getMonitorName(),
+							resource.getName(), metric.getName(), from, to, limit));
+					}
 				}
 			}
 		}
@@ -212,13 +229,22 @@ public class ApiController {
 		
 		System.out.println(builder.toUriString());
 		RestTemplate restTemplate = new RestTemplate();
-		Measurement[] measurements = restTemplate.getForObject(builder.toUriString(), Measurement[].class);
+		Measurement[] measurements = null;
+		try {
+			measurements = restTemplate.getForObject(builder.toUriString(), Measurement[].class);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return null;
+		}
 		
 		MetricsData data = new MetricsData();
+		data.setResourceName(resourceName);
 		data.setName(monitorName);
 		data.setType(metricName);
-		data.setLastValue(measurements[measurements.length-1].getValue());
-		data.setTime(measurements[measurements.length-1].getTime());
+		if(measurements.length>0) {
+			data.setLastValue(measurements[measurements.length-1].getValue());
+			data.setTime(measurements[measurements.length-1].getTime());
+		}
 		data.setValueData(Measurement.getValues(measurements));
 		data.setTimeData(Measurement.getTimes(measurements));
 		

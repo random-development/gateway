@@ -1,7 +1,10 @@
 package com.randomdevelopment.gateway.model;
 
 public class MetricsData {
+	
+
 	private String name;
+	private String resourceName;
 	private String type;
 	private Double lastValue;
 	private Long time;
@@ -41,6 +44,12 @@ public class MetricsData {
 	}
 	public void setValueData(double[] valueData) {
 		this.valueData = valueData;
+	}
+	public String getResourceName() {
+		return resourceName;
+	}
+	public void setResourceName(String resourceName) {
+		this.resourceName = resourceName;
 	}
 	private long[] timeData;
 	private double[] valueData;

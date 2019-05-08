@@ -20,6 +20,7 @@ import com.randomdevelopment.gateway.model.Monitor;
 import com.randomdevelopment.gateway.model.MonitorDB;
 import com.randomdevelopment.gateway.model.MonitorInfo;
 import com.randomdevelopment.gateway.model.Monitors;
+import com.randomdevelopment.gateway.model.ResourceName;
 import com.randomdevelopment.gateway.model.MResource;
 import com.randomdevelopment.gateway.model.Resources;
 
@@ -75,10 +76,13 @@ public class MonitorProvider {
 		return monitorUris.get(monitorName);
 	}
 	
-	public void setMonitor(MonitorInfo info) {
+	public boolean setMonitor(MonitorInfo info) {
 		Monitor monitor = getMonitorData(info);
 		if (monitor == null) {
-			return;
+			return false;
+		}
+		if(info.getUrl().charAt(info.getUrl().length() - 1) != '/') {
+			info.setUrl(info.getUrl() + "/");
 		}
 		monitorUris.put(info.getName(), info.getUrl());
 		boolean added = false;
@@ -95,6 +99,8 @@ public class MonitorProvider {
 		
 		monitorRepository.deleteAll();
 		monitorRepository.save(new MonitorDB((long)1, monitorUris));
+		
+		return true;
 	}
 	
 	public void removeMonitor(String monitorName) {
@@ -112,6 +118,7 @@ public class MonitorProvider {
 	public void removeAll() {
 		monitorUris = new HashMap<>();
 		monitors = new ArrayList<>();
+		monitorRepository.deleteAll();
 	}
 	
 	public Monitors getMonitorsData(String dataUri) {
@@ -122,7 +129,17 @@ public class MonitorProvider {
 		    String key = entry.getKey();
 		    String monitorUri = entry.getValue();
 
-		    final String uri = monitorUri;
+		    MonitorInfo monitorInfo = new MonitorInfo();
+		    monitorInfo.setName(key);
+		    monitorInfo.setUrl(monitorUri);
+		    
+		    Monitor monitor = getMonitorData(monitorInfo);
+		    
+		    if(monitor != null) {
+		    	monitorsList.add(monitor);
+		    }
+		    
+		    /*final String uri = monitorUri;
 			RestTemplate restTemplate = new RestTemplate();
 			System.out.println(uri);
 			MResource[] resources = null;
@@ -136,7 +153,7 @@ public class MonitorProvider {
 			Monitor monitor = new Monitor();
 			monitor.setName(key);
 			monitor.setResources(resources);
-			monitorsList.add(monitor);
+			monitorsList.add(monitor);*/
 		}
 		Monitor[] ms = monitorsList.toArray(new Monitor[monitorsList.size()]);
 		monitors.setMonitors(ms);
@@ -144,20 +161,38 @@ public class MonitorProvider {
 	}
 	
 	public Monitor getMonitorData(MonitorInfo info) {
-		final String uri = info.getUrl();
+		String uri = info.getUrl();
+		if(uri.charAt(uri.length() - 1) != '/') {
+			uri = uri + "/";
+		}
+		uri = uri + MonitorApi.ResourcesPart;
 		RestTemplate restTemplate = new RestTemplate();
 		System.out.println(uri);
-		MResource[] resources = null;
+		ResourceName[] resourceNames = null;
 		try {
-			resources = restTemplate.getForObject(uri, MResource[].class);
+			resourceNames = restTemplate.getForObject(uri, ResourceName[].class);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
 		}
 		
+		List<MResource> resources = new ArrayList<MResource>();
+		
+		for(ResourceName resourceName: resourceNames) {
+			String resourceUri = uri + resourceName.getName();
+			//restTemplate = new RestTemplate();
+			try {
+				MResource resource = restTemplate.getForObject(resourceUri, MResource.class);
+				resources.add(resource);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
+		}
+		
 		Monitor monitor = new Monitor();
 		monitor.setName(info.getName());
-		monitor.setResources(resources);
+		monitor.setResources(resources.toArray(new MResource[resources.size()]));
 		
 		return monitor;
 	}

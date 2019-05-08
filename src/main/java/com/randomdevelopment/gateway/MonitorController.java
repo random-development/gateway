@@ -5,6 +5,8 @@ import java.util.HashMap;
 import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,16 +32,16 @@ public class MonitorController {
 	
 	@PostMapping
 	@RequestMapping(produces = "application/json", value = "/manage", method = RequestMethod.POST)
-	public String manage(@RequestBody MonitorInfo info) {
+	public ResponseEntity manage(@RequestBody MonitorInfo info) {
 		    
 		/*final String uri = "http://hibron.usermd.net:5000/mock/monitors/monitor_hdmi/resources/komp_za_sciana/metrics/temp";
 		RestTemplate restTemplate = new RestTemplate();
 		Metric result = restTemplate.getForObject(uri, Metric.class);*/
-		monitorProvider.setMonitor(info);
+		boolean result = monitorProvider.setMonitor(info);
 		
 		//monitorRepository.save(new MonitorDB());
 		
-		return "OK";
+		return result ? new ResponseEntity(HttpStatus.OK) : new ResponseEntity(HttpStatus.BAD_REQUEST);
 	}
 	
 	@DeleteMapping
