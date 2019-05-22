@@ -7,10 +7,25 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
@@ -28,6 +43,7 @@ public class ApiController {
 	
 	 @Resource
 	 MonitorProvider monitorProvider;
+	 
 	
 	@GetMapping
 	@RequestMapping(produces = "application/json", value = "/monitors10")
@@ -173,7 +189,8 @@ public class ApiController {
 	}
 	
 	@GetMapping
-	@RequestMapping(produces = "application/json", value = "/monitors/{monitorName}/resources/{resourceName}/metrics")
+	@RequestMapping(produces = "application/json", value = "/monitors/{monitorName}/resources/{resourceName}/metrics",
+			method=RequestMethod.GET)
 	public Metric[] metrics(@PathVariable("monitorName") String monitorName, @PathVariable("resourceName") String resourceName) {
 		final String monitorUri = monitorProvider.getMonitorUri(monitorName); 
 		final String uri = monitorUri + MonitorApi.ResourcesPart + resourceName + "/" + MonitorApi.MetricsPart;
@@ -183,6 +200,74 @@ public class ApiController {
 		Metric[] result = restTemplate.getForObject(uri, Metric[].class);
 		
 		return result;
+	}
+	
+	@PostMapping
+	@RequestMapping(produces = "application/json", value = "/monitors/{monitorName}/resources/{resourceName}/metrics",
+			method=RequestMethod.POST)
+	public ResponseEntity<?> metricsPost(@PathVariable("monitorName") String monitorName, @PathVariable("resourceName") String resourceName, @RequestBody String body) {
+		final String monitorUri = monitorProvider.getMonitorUri(monitorName); 
+		System.out.println("monitor uri:" + monitorUri);
+		if(monitorUri == null) {
+			 return new ResponseEntity<String>("{ \"error\":\"monitor not found\"}", HttpStatus.NOT_FOUND);
+		}
+		final String uri = monitorUri + MonitorApi.ResourcesPart + resourceName + "/" + MonitorApi.MetricsPart;
+		System.out.println(uri);
+		System.out.println(body);
+		
+		CloseableHttpClient client = HttpClients.createDefault();
+	    HttpPost httpPost = new HttpPost(uri);
+	 
+	    try {
+		    String json = body;
+		    StringEntity entity = new StringEntity(json);
+		    httpPost.setEntity(entity);
+		    httpPost.setHeader("Accept", "application/json");
+		    httpPost.setHeader("Content-type", "application/json");
+		 
+		    CloseableHttpResponse response = client.execute(httpPost);
+		    int code = response.getStatusLine().getStatusCode();
+		    HttpEntity entityResponse = response.getEntity();
+		    String responseString = EntityUtils.toString(entityResponse, "UTF-8");
+		    System.out.println(responseString);
+		    client.close();
+		    return new ResponseEntity<String>(responseString, HttpStatus.valueOf(code));
+	    } catch (Exception e) {
+	    	System.out.println("ERROR metricsPost");
+	    	e.printStackTrace();
+	    	return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+	    }		
+	}
+	
+	@DeleteMapping
+	@RequestMapping(produces = "application/json", value = "/monitors/{monitorName}/resources/{resourceName}/metrics/{metricName}",
+			method=RequestMethod.DELETE)
+	public ResponseEntity<?> metricsDelete(@PathVariable("monitorName") String monitorName, @PathVariable("resourceName") String resourceName, @PathVariable("metricName") String metricName) {
+		final String monitorUri = monitorProvider.getMonitorUri(monitorName); 
+		if(monitorUri == null) {
+			 return new ResponseEntity<String>("{ \"error\":\"monitor not found\"}", HttpStatus.NOT_FOUND);
+		}
+		final String uri = monitorUri + MonitorApi.ResourcesPart + resourceName + "/" + MonitorApi.MetricsPart + metricName;
+		if(monitorUri == null) return null;
+		System.out.println(uri);
+		
+		CloseableHttpClient client = HttpClients.createDefault();
+	    HttpDelete httpDelete = new HttpDelete(uri);
+	 
+	    try {
+		 
+		    CloseableHttpResponse response = client.execute(httpDelete);
+		    int code = response.getStatusLine().getStatusCode();
+		    HttpEntity entityResponse = response.getEntity();
+		    String responseString = EntityUtils.toString(entityResponse, "UTF-8");
+		    System.out.println(responseString);
+		    client.close();
+		    return new ResponseEntity<String>(responseString, HttpStatus.valueOf(code));
+	    } catch (Exception e) {
+	    	System.out.println("ERROR metricsDelete");
+	    	e.printStackTrace();
+	    	return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+	    }		
 	}
 	
 	@GetMapping
