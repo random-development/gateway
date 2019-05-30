@@ -30,7 +30,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     @Bean
     public RemoteTokenServices tokenService() {
         RemoteTokenServices tokenService = new RemoteTokenServices();
-        tokenService.setCheckTokenEndpointUrl("http://localhost:8080/oauth/check_token");
+        tokenService.setCheckTokenEndpointUrl("http://hibron.usermd.net:7000/oauth/check_token");
         tokenService.setClientId("resource-client");
         tokenService.setClientSecret("noonewilleverguess2");
         return tokenService;

@@ -38,7 +38,7 @@ import com.randomdevelopment.gateway.model.MResource;
 import com.randomdevelopment.gateway.model.Measurement;
 
 @RestController
-@RequestMapping("gateway")
+@RequestMapping(value= {"gateway", "gateway-with-auth"})
 public class ApiController {
 	
 	 @Resource
