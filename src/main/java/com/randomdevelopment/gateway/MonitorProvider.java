@@ -167,7 +167,7 @@ public class MonitorProvider {
 		}
 		uri = uri + MonitorApi.ResourcesPart;
 		RestTemplate restTemplate = new RestTemplate();
-		System.out.println(uri);
+		System.out.println("getMonitorData" + uri);
 		ResourceName[] resourceNames = null;
 		try {
 			resourceNames = restTemplate.getForObject(uri, ResourceName[].class);
@@ -195,5 +195,16 @@ public class MonitorProvider {
 		monitor.setResources(resources.toArray(new MResource[resources.size()]));
 		
 		return monitor;
+	}
+	
+	public void rebuild() {
+		System.out.println("monitors rebuilt started");
+		for (int i = 0; i < monitors.size(); i++) {
+			MonitorInfo info = new MonitorInfo();
+			info.setName(monitors.get(i).getName());
+			info.setUrl(getMonitorUri(info.getName()));
+			monitors.set(i, getMonitorData(info));
+		}
+		System.out.println("monitors rebuilt successfully");
 	}
 }

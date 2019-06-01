@@ -13,7 +13,7 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 @Configuration
 @EnableResourceServer
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
-
+	
     @Bean("resourceServerRequestMatcher")
     public RequestMatcher resources() {
         return new AntPathRequestMatcher("/gateway-with-auth/**");
@@ -30,7 +30,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     @Bean
     public RemoteTokenServices tokenService() {
         RemoteTokenServices tokenService = new RemoteTokenServices();
-        tokenService.setCheckTokenEndpointUrl("http://hibron.usermd.net:7000/oauth/check_token");
+        tokenService.setCheckTokenEndpointUrl("http://localhost:7000/oauth/check_token");
         tokenService.setClientId("resource-client");
         tokenService.setClientSecret("noonewilleverguess2");
         return tokenService;

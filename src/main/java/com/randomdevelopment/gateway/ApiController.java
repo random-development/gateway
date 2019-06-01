@@ -15,10 +15,14 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
+import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,7 +48,22 @@ public class ApiController {
 	 @Resource
 	 MonitorProvider monitorProvider;
 	 
-	
+
+	 @NestedConfigurationProperty
+	  private AuthorizationCodeResourceDetails client = new AuthorizationCodeResourceDetails();
+
+	  public AuthorizationCodeResourceDetails getClient() {
+	    return client;
+	  }
+	  
+	  @NestedConfigurationProperty
+	  private ClientCredentialsResourceDetails client2 = new ClientCredentialsResourceDetails();
+
+	  /*public ClientCredentialsResourceDetails getClient() {
+	    return client;
+	  }*/
+	 
+	 
 	@GetMapping
 	@RequestMapping(produces = "application/json", value = "/monitors10")
 	public Metric monitors10() {
@@ -57,6 +76,18 @@ public class ApiController {
 	}
 	
 	@GetMapping
+	@RequestMapping(produces = "application/json", value = "/removeresources")
+	public String removeresources() {
+		    
+		for(Monitor monitor: monitorProvider.getMonitors()) {
+			
+			monitor.setResources(new MResource[] {});
+		}
+		
+		return "ok";
+	}
+	
+	@GetMapping
 	@RequestMapping(produces = "application/json", value = "/metrics")
 	public List<MetricsData> metricsFilter(@RequestParam(value = "resources", required = false) String resourcesData, 
 			@RequestParam(value = "resourceName", required = false) String resourceName,
@@ -65,6 +96,8 @@ public class ApiController {
 			@RequestParam(value = "to", required = false) String to,
 			@RequestParam(value = "limit", required = false) String limit) {
 		System.out.println(resourcesData);
+		
+		monitorProvider.rebuild();
 		
 		List<MResource> resourcesFiltered = new ArrayList<>(); 
 		
@@ -158,7 +191,10 @@ public class ApiController {
 	
 	@GetMapping
 	@RequestMapping(produces = "application/json", value = "/monitors")
-	public Monitor[] monitors() {
+	public Monitor[] monitors(OAuth2Authentication authentication) {
+		if(authentication != null) {
+			System.out.println("CLIENT ID = " + authentication.getName());//getClient().get());
+		}
 		return monitorProvider.getMonitorsData("monitors/").getMonitors();
 	}
 	

@@ -34,10 +34,10 @@ public class MetricDeserializer extends StdDeserializer<Metric> {
         if (node.get("type") == null) {
         	return new Metric();
         }
-        System.out.println(node.asText());
+        //System.out.println(node.asText());
         String type = (String) ( node.get("type")).asText();
         Metric m;
-        System.out.println(node.asText());
+        //System.out.println(node.asText());
         if ( type.equals("complex")) {
         	m = new ComplexMetric();
         	((ComplexMetric)m).setUserId(node.get("userId").asText());
