@@ -48,10 +48,10 @@ public class MonitorProvider {
 		monitorUris = new HashMap<>();
 		monitors = new ArrayList<>();
 		/*
-		monitorUris.put("monitor_hdmi", "http://hibron.usermd.net:5000/mock/monitors/monitor_hdmi/");
-		monitorUris.put("monitor_komplex", "http://hibron.usermd.net:5000/mock/monitors/monitor_komplex/");
-		monitorUris.put("monitor_dsub", "http://hibron.usermd.net:5000/mock/monitors/monitor_dsub/");
-		monitorUris.put("monitor_bez_kompa", "http://hibron.usermd.net:5000/mock/monitors/monitor_bez_kompa/");
+		monitorUris.put("monitor_hdmi", "http://localhost:5000/mock/monitors/monitor_hdmi/");
+		monitorUris.put("monitor_komplex", "http://localhost:5000/mock/monitors/monitor_komplex/");
+		monitorUris.put("monitor_dsub", "http://localhost:5000/mock/monitors/monitor_dsub/");
+		monitorUris.put("monitor_bez_kompa", "http://localhost:5000/mock/monitors/monitor_bez_kompa/");
 		*/
 	}
 	

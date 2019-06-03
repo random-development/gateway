@@ -34,7 +34,7 @@ public class MonitorController {
 	@RequestMapping(produces = "application/json", value = "/manage", method = RequestMethod.POST)
 	public ResponseEntity manage(@RequestBody MonitorInfo info) {
 		    
-		/*final String uri = "http://hibron.usermd.net:5000/mock/monitors/monitor_hdmi/resources/komp_za_sciana/metrics/temp";
+		/*final String uri = "http://localhost:5000/mock/monitors/monitor_hdmi/resources/komp_za_sciana/metrics/temp";
 		RestTemplate restTemplate = new RestTemplate();
 		Metric result = restTemplate.getForObject(uri, Metric.class);*/
 		boolean result = monitorProvider.setMonitor(info);
@@ -48,7 +48,7 @@ public class MonitorController {
 	@RequestMapping(produces = "application/json", value = "/manage", method = RequestMethod.DELETE)
 	public String manageDel(@RequestBody MonitorInfo info) {
 		    
-		/*final String uri = "http://hibron.usermd.net:5000/mock/monitors/monitor_hdmi/resources/komp_za_sciana/metrics/temp";
+		/*final String uri = "http://localhost:5000/mock/monitors/monitor_hdmi/resources/komp_za_sciana/metrics/temp";
 		RestTemplate restTemplate = new RestTemplate();
 		Metric result = restTemplate.getForObject(uri, Metric.class);*/
 		monitorProvider.removeMonitor(info.getName());
