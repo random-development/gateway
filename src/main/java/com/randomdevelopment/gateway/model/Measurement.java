@@ -19,7 +19,7 @@ public class Measurement {
 	public static double[] getValues(Measurement[] measurements) {
 		double[] values = new double[measurements.length];
 		for(int i=0; i<measurements.length; i++) {
-			values[i] = measurements[i].getValue();
+			values[i] = measurements[measurements.length-i-1].getValue();
 		}
 		return values;
 	}
@@ -27,7 +27,7 @@ public class Measurement {
 	public static long[] getTimes(Measurement[] measurements) {
 		long[] times = new long[measurements.length];
 		for(int i=0; i<measurements.length; i++) {
-			times[i] = measurements[i].getTime();
+			times[i] = measurements[measurements.length-i-1].getTime();
 		}
 		return times;
 	}

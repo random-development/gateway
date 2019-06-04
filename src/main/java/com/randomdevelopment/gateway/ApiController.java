@@ -401,8 +401,8 @@ public class ApiController {
 		data.setName(monitorName);
 		data.setType(metricName);
 		if(measurements.length>0) {
-			data.setLastValue(measurements[measurements.length-1].getValue());
-			data.setTime(measurements[measurements.length-1].getTime());
+			data.setLastValue(measurements[0].getValue());
+			data.setTime(measurements[0].getTime());
 		}
 		data.setValueData(Measurement.getValues(measurements));
 		data.setTimeData(Measurement.getTimes(measurements));
