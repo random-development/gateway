@@ -192,6 +192,7 @@ public class MonitorProvider {
 				MResource resource = restTemplate.getForObject(resourceUri, MResource.class);
 				resources.add(resource);
 			} catch (Exception e) {
+				System.out.println(resourceUri);
 				e.printStackTrace();
 				return null;
 			}

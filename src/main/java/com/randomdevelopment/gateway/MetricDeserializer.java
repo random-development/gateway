@@ -40,10 +40,18 @@ public class MetricDeserializer extends StdDeserializer<Metric> {
         //System.out.println(node.asText());
         if ( type.equals("COMPLEX")) {
         	m = new ComplexMetric();
-        	((ComplexMetric)m).setUserId(node.get("userId").asText());
-        	((ComplexMetric)m).setSourceMetric(node.get("sourceMetric").asText());
-        	((ComplexMetric)m).setPeriod(node.get("period").intValue());
-        	((ComplexMetric)m).setInterval(node.get("interval").intValue());
+        	if(node.get("userId") != null) {
+        		((ComplexMetric)m).setUserId(node.get("userId").asText());
+        	}
+        	if(node.get("sourceMetric") != null ) {
+        		((ComplexMetric)m).setSourceMetric(node.get("sourceMetric").asText());
+        	}
+        	if(node.get("period") != null) {
+        		((ComplexMetric)m).setPeriod(node.get("period").intValue());
+        	}
+        	if(node.get("interval") != null) {
+        	(	(ComplexMetric)m).setInterval(node.get("interval").intValue());
+        	}
         } else {
         	m = new Metric();
         }
