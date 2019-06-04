@@ -73,7 +73,7 @@ public class ApiController {
 	@RequestMapping(produces = "application/json", value = "/monitors10")
 	public Metric monitors10() {
 		    
-		final String uri = "http://hibron.usermd.net:5000/mock/monitors/monitor_hdmi/resources/komp_za_sciana/metrics/temp";
+		final String uri = "http://localhost:5000/mock/monitors/monitor_hdmi/resources/komp_za_sciana/metrics/temp";
 		RestTemplate restTemplate = new RestTemplate();
 		Metric result = restTemplate.getForObject(uri, Metric.class);
 		
