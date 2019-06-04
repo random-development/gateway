@@ -102,6 +102,10 @@ public class ApiController {
 			@RequestParam(value = "limit", required = false) String limit) {
 		System.out.println(resourcesData);
 		
+		System.out.println("res:" + resourcesData);
+		System.out.println("resname: " + resourceName);
+		System.out.println("type: " + type);
+		
 		monitorProvider.rebuild();
 		
 		List<MResource> resourcesFiltered = new ArrayList<>(); 

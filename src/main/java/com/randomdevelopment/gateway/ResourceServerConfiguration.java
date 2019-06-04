@@ -1,5 +1,6 @@
 package com.randomdevelopment.gateway;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -13,6 +14,9 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 @Configuration
 @EnableResourceServer
 public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter {
+	
+	@Value("${security.oauth2.resource.token-info-uri}")
+	private String tokenInfoUri;
 	
     @Bean("resourceServerRequestMatcher")
     public RequestMatcher resources() {
@@ -30,7 +34,7 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     @Bean
     public RemoteTokenServices tokenService() {
         RemoteTokenServices tokenService = new RemoteTokenServices();
-        tokenService.setCheckTokenEndpointUrl("http://localhost:7000/oauth/check_token");
+        tokenService.setCheckTokenEndpointUrl(tokenInfoUri);
         tokenService.setClientId("resource-client");
         tokenService.setClientSecret("noonewilleverguess2");
         return tokenService;
