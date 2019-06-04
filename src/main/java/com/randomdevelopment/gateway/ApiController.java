@@ -138,8 +138,9 @@ public class ApiController {
 		} else {
 			System.out.println(monitorProvider.getMonitors().size());
 			for(Monitor monitor: monitorProvider.getMonitors()) {
-				
-				resourcesFiltered.addAll(Arrays.asList(monitor.getResources()));
+				if(monitor != null) {
+					resourcesFiltered.addAll(Arrays.asList(monitor.getResources()));
+				}
 			}
 		}
 		
