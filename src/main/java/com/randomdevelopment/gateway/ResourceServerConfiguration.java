@@ -27,7 +27,8 @@ public class ResourceServerConfiguration extends ResourceServerConfigurerAdapter
     public void configure(final HttpSecurity http) throws Exception {
         http
             .requestMatcher(resources()).authorizeRequests()
-            .anyRequest().authenticated();
+            .anyRequest().authenticated()
+            .and().logout().logoutSuccessUrl("/").permitAll();
     }
     
     @Primary
