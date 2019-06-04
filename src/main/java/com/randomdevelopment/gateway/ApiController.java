@@ -161,6 +161,34 @@ public class ApiController {
 		
 		//creating MetricsData
 		List<MetricsData> metricsDatas = new ArrayList<>();
+		
+		/*resourcesFiltered.parallelStream().forEach((resource) -> {
+			for(Metric metric: resource.getMetrics()) {
+				//type filter
+				boolean inFilter = false;
+				if(type != null) {
+					String[] types = type.split(",");
+					for(String singleType: types) {
+						if (metric.getName().contains(singleType)) {
+							inFilter = true;
+							break;
+						}
+					}
+				} else {
+					inFilter = true;
+				}
+				if(inFilter) {
+
+					MetricsData data = getMetricsData(resource.getMonitorName(),
+							resource.getName(), metric.getName(), from, to, limit);
+					if(data != null) {
+						metricsDatas.add(getMetricsData(resource.getMonitorName(),
+							resource.getName(), metric.getName(), from, to, limit));
+					}
+				}
+			}
+		});*/
+		
 		for(MResource resource: resourcesFiltered) {
 			for(Metric metric: resource.getMetrics()) {
 				//type filter
