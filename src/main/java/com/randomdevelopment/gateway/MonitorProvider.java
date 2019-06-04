@@ -125,6 +125,7 @@ public class MonitorProvider {
 		
 		Monitors monitors = new Monitors();
 		ArrayList<Monitor> monitorsList = new ArrayList<>();
+		ArrayList<String> UrisToDelete = new ArrayList<>();
 		for(Map.Entry<String, String> entry : monitorUris.entrySet()) {
 		    String key = entry.getKey();
 		    String monitorUri = entry.getValue();
@@ -137,6 +138,8 @@ public class MonitorProvider {
 		    
 		    if(monitor != null) {
 		    	monitorsList.add(monitor);
+		    }else {
+		    	UrisToDelete.add(monitorInfo.getName());
 		    }
 		    
 		    /*final String uri = monitorUri;
@@ -155,6 +158,9 @@ public class MonitorProvider {
 			monitor.setResources(resources);
 			monitorsList.add(monitor);*/
 		}
+		for(String toDelete: UrisToDelete) {
+			monitorUris.remove(toDelete);
+		}
 		Monitor[] ms = monitorsList.toArray(new Monitor[monitorsList.size()]);
 		monitors.setMonitors(ms);
 		return monitors;
@@ -172,7 +178,8 @@ public class MonitorProvider {
 		try {
 			resourceNames = restTemplate.getForObject(uri, ResourceName[].class);
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
+			System.out.println("monitor is unavailable");
 			return null;
 		}
 		

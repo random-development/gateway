@@ -15,6 +15,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.repository.query.Param;
@@ -38,6 +39,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.randomdevelopment.gateway.model.Metric;
 import com.randomdevelopment.gateway.model.MetricsData;
 import com.randomdevelopment.gateway.model.Monitor;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.randomdevelopment.gateway.model.ComplexMetric;
 import com.randomdevelopment.gateway.model.MResource;
 import com.randomdevelopment.gateway.model.Measurement;
 
@@ -241,7 +246,12 @@ public class ApiController {
 	@PostMapping
 	@RequestMapping(produces = "application/json", value = "/monitors/{monitorName}/resources/{resourceName}/metrics",
 			method=RequestMethod.POST)
-	public ResponseEntity<?> metricsPost(@PathVariable("monitorName") String monitorName, @PathVariable("resourceName") String resourceName, @RequestBody String body) {
+	public ResponseEntity<?> metricsPost(@PathVariable("monitorName") String monitorName, @PathVariable("resourceName") String resourceName, @RequestBody String body, OAuth2Authentication authentication) {
+		if(authentication == null) {
+			return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
+			//System.out.println("CLIENT ID = " + authentication.getName());//getClient().get());
+		}
+		final String currentUser = authentication.getUserAuthentication().getName();
 		final String monitorUri = monitorProvider.getMonitorUri(monitorName); 
 		System.out.println("monitor uri:" + monitorUri);
 		if(monitorUri == null) {
@@ -255,8 +265,22 @@ public class ApiController {
 	    HttpPost httpPost = new HttpPost(uri);
 	 
 	    try {
-		    String json = body;
-		    StringEntity entity = new StringEntity(json);
+	    	JsonParser parser = new JsonParser();
+	    	JsonObject json = parser.parse(body).getAsJsonObject();
+	    	Metric oldMetric = metrics(monitorName, resourceName, json.get("name").getAsString());
+	    	if(oldMetric != null && oldMetric.getType().equals("COMPLEX")) {
+	    		//System.out.println("OOLD METRIC " + ((ComplexMetric)oldMetric).getUserId());
+	    		String metricUser = ((ComplexMetric)oldMetric).getUserId();
+	    		if ( ! currentUser.equals(metricUser)) {
+	    			return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
+	    		}
+	    	}
+		    //String json = "";
+	    	json.remove("userId");
+	    	json.addProperty("userId", currentUser);
+	    	//System.out.println("SOURCE:" + json.get("userId"));
+		    StringEntity entity = new StringEntity(json.toString());
+		    //JS json = new JSONObject(body);
 		    httpPost.setEntity(entity);
 		    httpPost.setHeader("Accept", "application/json");
 		    httpPost.setHeader("Content-type", "application/json");
@@ -278,7 +302,12 @@ public class ApiController {
 	@DeleteMapping
 	@RequestMapping(produces = "application/json", value = "/monitors/{monitorName}/resources/{resourceName}/metrics/{metricName}",
 			method=RequestMethod.DELETE)
-	public ResponseEntity<?> metricsDelete(@PathVariable("monitorName") String monitorName, @PathVariable("resourceName") String resourceName, @PathVariable("metricName") String metricName) {
+	public ResponseEntity<?> metricsDelete(@PathVariable("monitorName") String monitorName, @PathVariable("resourceName") String resourceName, @PathVariable("metricName") String metricName, OAuth2Authentication authentication) {
+		if(authentication == null) {
+			return new ResponseEntity<String>(HttpStatus.UNAUTHORIZED);
+			//System.out.println("CLIENT ID = " + authentication.getName());//getClient().get());
+		}
+		final String currentUser = authentication.getUserAuthentication().getName();
 		final String monitorUri = monitorProvider.getMonitorUri(monitorName); 
 		if(monitorUri == null) {
 			 return new ResponseEntity<String>("{ \"error\":\"monitor not found\"}", HttpStatus.NOT_FOUND);
@@ -291,7 +320,15 @@ public class ApiController {
 	    HttpDelete httpDelete = new HttpDelete(uri);
 	 
 	    try {
-		 
+	    	JsonParser parser = new JsonParser();
+	    	Metric oldMetric = metrics(monitorName, resourceName, metricName);
+	    	if(oldMetric != null && oldMetric.getType().equals("COMPLEX")) {
+	    		//System.out.println("OOLD METRIC " + ((ComplexMetric)oldMetric).getUserId());
+	    		String metricUser = ((ComplexMetric)oldMetric).getUserId();
+	    		if ( ! currentUser.equals(metricUser)) {
+	    			return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
+	    		}
+	    	}
 		    CloseableHttpResponse response = client.execute(httpDelete);
 		    int code = response.getStatusLine().getStatusCode();
 		    HttpEntity entityResponse = response.getEntity();
