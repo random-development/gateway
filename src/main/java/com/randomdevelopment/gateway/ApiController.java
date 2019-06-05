@@ -2,6 +2,7 @@ package com.randomdevelopment.gateway;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -19,6 +20,7 @@ import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.boot.context.properties.NestedConfigurationProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.oauth2.client.token.grant.client.ClientCredentialsResourceDetails;
@@ -162,65 +164,92 @@ public class ApiController {
 		//creating MetricsData
 		List<MetricsData> metricsDatas = new ArrayList<>();
 		
-		/*resourcesFiltered.parallelStream().forEach((resource) -> {
-			for(Metric metric: resource.getMetrics()) {
-				//type filter
-				boolean inFilter = false;
-				if(type != null) {
-					String[] types = type.split(",");
-					for(String singleType: types) {
-						if (metric.getName().contains(singleType)) {
-							inFilter = true;
-							break;
+		
+		try {
+			List<Pair<MResource, Metric>> datasForOrder = new ArrayList<>();
+			
+			for(MResource resource: resourcesFiltered) {
+				for(Metric metric: resource.getMetrics()) {
+					//type filter
+					boolean inFilter = false;
+					if(type != null) {
+						String[] types = type.split(",");
+						for(String singleType: types) {
+							if (metric.getName().contains(singleType)) {
+								inFilter = true;
+								break;
+							}
 						}
+					} else {
+						inFilter = true;
 					}
-				} else {
-					inFilter = true;
-				}
-				if(inFilter) {
-
-					MetricsData data = getMetricsData(resource.getMonitorName(),
-							resource.getName(), metric.getName(), from, to, limit);
-					if(data != null) {
-						metricsDatas.add(getMetricsData(resource.getMonitorName(),
-							resource.getName(), metric.getName(), from, to, limit));
+					if(inFilter) {
+	
+						datasForOrder.add(Pair.of(resource, metric));
 					}
 				}
 			}
-		});*/
-		
-		for(MResource resource: resourcesFiltered) {
-			for(Metric metric: resource.getMetrics()) {
-				//type filter
-				boolean inFilter = false;
-				if(type != null) {
-					String[] types = type.split(",");
-					for(String singleType: types) {
-						if (metric.getName().contains(singleType)) {
-							inFilter = true;
-							break;
-						}
-					}
-				} else {
-					inFilter = true;
+			
+			List<MetricsData> metricsDatasUnordered = Collections.synchronizedList(new ArrayList<MetricsData>());//new ArrayList<>();
+			datasForOrder.parallelStream().forEach((pair) -> {
+				
+				
+				MetricsData data = getMetricsData(pair.getFirst().getMonitorName(),
+						pair.getFirst().getName(), pair.getSecond().getName(), from, to, limit);
+				if(data != null) {
+					metricsDatasUnordered.add(data);
 				}
-				if(inFilter) {
-					/*MetricsData data = new MetricsData();
-					data.setName(resource.getMonitorName());
-					data.setType(metric.getType());*/
-
-					MetricsData data = getMetricsData(resource.getMonitorName(),
-							resource.getName(), metric.getName(), from, to, limit);
-					if(data != null) {
-						metricsDatas.add(getMetricsData(resource.getMonitorName(),
-							resource.getName(), metric.getName(), from, to, limit));
+			});
+			
+			int i=0;
+			for(Pair<MResource, Metric> pair: datasForOrder) {
+				for(MetricsData unordered: metricsDatasUnordered) {
+					if(		unordered.getName().equals(pair.getFirst().getMonitorName())
+							&& 
+							unordered.getResourceName().equals(pair.getFirst().getName())
+							&&
+							unordered.getType().equals(pair.getSecond().getName())) {
+								metricsDatas.add(unordered);
+								i++;
+					}
+				}
+			}
+			if(i != datasForOrder.size()) {
+				throw new Exception("NOT ALL METRICS DOWNLOADED");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.out.println("ERROR DURING PARALLEL COMMUNICATION WITH MONITORS");
+			for(MResource resource: resourcesFiltered) {
+				for(Metric metric: resource.getMetrics()) {
+					//type filter
+					boolean inFilter = false;
+					if(type != null) {
+						String[] types = type.split(",");
+						for(String singleType: types) {
+							if (metric.getName().contains(singleType)) {
+								inFilter = true;
+								break;
+							}
+						}
+					} else {
+						inFilter = true;
+					}
+					if(inFilter) {
+						/*MetricsData data = new MetricsData();
+						data.setName(resource.getMonitorName());
+						data.setType(metric.getType());*/
+	
+						MetricsData data = getMetricsData(resource.getMonitorName(),
+								resource.getName(), metric.getName(), from, to, limit);
+						if(data != null) {
+							metricsDatas.add(getMetricsData(resource.getMonitorName(),
+								resource.getName(), metric.getName(), from, to, limit));
+						}
 					}
 				}
 			}
 		}
-		
-		
-		
 		
 		
 		//return monitorProvider.getMonitorsData("monitors/").getMonitors();
