@@ -87,8 +87,9 @@ public class ApiController {
 	public String removeresources() {
 		    
 		for(Monitor monitor: monitorProvider.getMonitors()) {
-			
-			monitor.setResources(new MResource[] {});
+			if(monitor != null) {
+				monitor.setResources(new MResource[] {});
+			}
 		}
 		
 		return "ok";
@@ -126,15 +127,17 @@ public class ApiController {
 				}
 			}
 			for(Monitor monitor: monitorProvider.getMonitors()) {
-				if(resourcesMap.containsKey(monitor.getName())) {
-					String[] resources = resourcesMap.get(monitor.getName());
-					if(resources == null) {
-						resourcesFiltered.addAll(Arrays.asList(monitor.getResources()));
-					}else {
-						for(String resource: resources) {
-							for(MResource monitorResource: monitor.getResources()) {
-								if(monitorResource.getName().equals(resource)) {
-									resourcesFiltered.add(monitorResource);
+				if(monitor != null) {
+					if(resourcesMap.containsKey(monitor.getName())) {
+						String[] resources = resourcesMap.get(monitor.getName());
+						if(resources == null) {
+							resourcesFiltered.addAll(Arrays.asList(monitor.getResources()));
+						}else {
+							for(String resource: resources) {
+								for(MResource monitorResource: monitor.getResources()) {
+									if(monitorResource.getName().equals(resource)) {
+										resourcesFiltered.add(monitorResource);
+									}
 								}
 							}
 						}

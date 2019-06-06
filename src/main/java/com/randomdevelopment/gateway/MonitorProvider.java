@@ -87,7 +87,7 @@ public class MonitorProvider {
 		monitorUris.put(info.getName(), info.getUrl());
 		boolean added = false;
 		for (int i = 0; i < monitors.size(); i++) {
-			if(monitors.get(i).getName().equals(info.getName())) {
+			if(monitors.get(i) != null && monitors.get(i).getName().equals(info.getName())) {
 				monitors.set(i, monitor);
 				added = true;
 				break;
@@ -159,7 +159,8 @@ public class MonitorProvider {
 			monitorsList.add(monitor);*/
 		}
 		for(String toDelete: UrisToDelete) {
-			monitorUris.remove(toDelete);
+			//monitorUris.remove(toDelete);
+			removeMonitor(toDelete);
 		}
 		Monitor[] ms = monitorsList.toArray(new Monitor[monitorsList.size()]);
 		monitors.setMonitors(ms);
@@ -207,11 +208,19 @@ public class MonitorProvider {
 	
 	public void rebuild() {
 		System.out.println("monitors rebuilt started");
-		for (int i = 0; i < monitors.size(); i++) {
-			MonitorInfo info = new MonitorInfo();
-			info.setName(monitors.get(i).getName());
-			info.setUrl(getMonitorUri(info.getName()));
-			monitors.set(i, getMonitorData(info));
+		for (int i = monitors.size()-1; i >= 0; i--) {
+			if(monitors.get(i) != null) {
+				MonitorInfo info = new MonitorInfo();
+				info.setName(monitors.get(i).getName());
+				info.setUrl(getMonitorUri(info.getName()));
+				monitors.set(i, getMonitorData(info));
+				if(monitors.get(i) == null) {
+					//removeMonitor(info.getName());
+					monitorUris.remove(info.getName());
+					monitors.remove(i);
+				}
+			}
+			
 		}
 		System.out.println("monitors rebuilt successfully");
 	}
